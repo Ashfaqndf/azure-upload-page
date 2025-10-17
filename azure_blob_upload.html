@@ -20,7 +20,7 @@
 <body>
     <h2>Upload File to Azure Blob Storage</h2>
     <input type="file" id="fileInput" />
-    <button onclick="uploadFile()">Upload</button>
+    <button id="uploadBtn">Upload</button>
     <p id="status"></p>
 
     <div id="progressContainer">
@@ -28,7 +28,9 @@
     </div>
 
     <script>
-        async function uploadFile() {
+        document.getElementById('uploadBtn').addEventListener('click', uploadFile);
+
+        function uploadFile() {
             const fileInput = document.getElementById('fileInput');
             const status = document.getElementById('status');
             const progressBar = document.getElementById('progressBar');
@@ -41,7 +43,7 @@
             const file = fileInput.files[0];
             const blobName = encodeURIComponent(file.name);
 
-            // ✅ Replace with your actual SAS token (use raw '&', not '&amp;')
+            // ✅ Replace with your actual SAS token (use raw '&')
             const sasToken = "?sp=rw&st=2025-10-17T09:48:15Z&se=2025-10-17T18:03:15Z&spr=https&sv=2024-11-04&sr=b&sig=YOUR_GENERATED_SIGNATURE";
 
             // ✅ Replace with your actual storage account and container name
@@ -49,6 +51,8 @@
             const containerName = "tempcontainer";
 
             const uploadUrl = `https://${storageAccount}.blob.core.windows.net/${containerName}/${blobName}${sasToken}`;
+
+            console.log("Uploading to:", uploadUrl);
 
             const xhr = new XMLHttpRequest();
             xhr.open("PUT", uploadUrl, true);
@@ -66,12 +70,14 @@
                 if (xhr.status === 201) {
                     status.textContent = "✅ Upload successful!";
                 } else {
-                    status.textContent = "❌ Upload failed: " + xhr.statusText;
+                    status.textContent = `❌ Upload failed: ${xhr.status} - ${xhr.statusText}`;
+                    console.error("Upload error:", xhr.responseText);
                 }
             };
 
             xhr.onerror = function () {
                 status.textContent = "❌ Error during upload.";
+                console.error("XHR error:", xhr);
             };
 
             xhr.send(file);
