@@ -50,7 +50,7 @@
             const storageAccount = "sgfortestingsasurl";
             const containerName = "tempcontainer";
 
-            const uploadUrl = `https://${storageAccount}.blob.core.windows.net/${containerName}/${blobName}${sasToken}`;
+            const uploadUrl = `https://sgfortestingsasurl.blob.core.windows.net/tempcontainer?sp=racwl&st=2025-10-17T09:48:15Z&se=2025-10-17T18:03:15Z&spr=https&sv=2024-11-04&sr=c&sig=q0IM1zQ%2FBxSHH%2FosyURkPqkXbJLPc4Nws0c6jy8Ew0g%3D`;
 
             console.log("Uploading to:", uploadUrl);
 
