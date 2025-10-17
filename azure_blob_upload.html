@@ -2,6 +2,20 @@
 <html>
 <head>
     <title>Azure Blob Upload</title>
+    <style>
+        #progressContainer {
+            width: 100%;
+            background-color: #eee;
+            margin-top: 10px;
+        }
+        #progressBar {
+            width: 0%;
+            height: 20px;
+            background-color: #4caf50;
+            text-align: center;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <h2>Upload File to Azure Blob Storage</h2>
@@ -9,10 +23,16 @@
     <button onclick="uploadFile()">Upload</button>
     <p id="status"></p>
 
+    <div id="progressContainer">
+        <div id="progressBar">0%</div>
+    </div>
+
     <script>
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
             const status = document.getElementById('status');
+            const progressBar = document.getElementById('progressBar');
+
             if (!fileInput.files.length) {
                 status.textContent = 'Please select a file.';
                 return;
@@ -21,27 +41,40 @@
             const file = fileInput.files[0];
             const blobName = encodeURIComponent(file.name);
 
-            // ✅ Correct SAS token with sr=b and raw '&' characters
-            const sasToken = "sp=racwl&st=2025-10-17T09:48:15Z&se=2025-10-17T18:03:15Z&spr=https&sv=2024-11-04&sr=c&sig=q0IM1zQ%2FBxSHH%2FosyURkPqkXbJLPc4Nws0c6jy8Ew0g%3D;
-            const uploadUrl = `https://sgfortestingsasurl.blob.core.windows.net/tempcontainer/${blobName}${sasToken}`;
+            // ✅ Replace with your actual SAS token (use raw '&', not '&amp;')
+            const sasToken = "?sp=rw&st=2025-10-17T09:48:15Z&se=2025-10-17T18:03:15Z&spr=https&sv=2024-11-04&sr=b&sig=YOUR_GENERATED_SIGNATURE";
 
-            try {
-                const response = await fetch(uploadUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'x-ms-blob-type': 'BlockBlob'
-                    },
-                    body: file
-                });
+            // ✅ Replace with your actual storage account and container name
+            const storageAccount = "sgfortestingsasurl";
+            const containerName = "tempcontainer";
 
-                if (response.ok) {
-                    status.textContent = 'Upload successful!';
-                } else {
-                    status.textContent = 'Upload failed: ' + response.statusText;
+            const uploadUrl = `https://${storageAccount}.blob.core.windows.net/${containerName}/${blobName}${sasToken}`;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", uploadUrl, true);
+            xhr.setRequestHeader("x-ms-blob-type", "BlockBlob");
+
+            xhr.upload.onprogress = function (event) {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    progressBar.style.width = percentComplete + "%";
+                    progressBar.textContent = percentComplete + "%";
                 }
-            } catch (error) {
-                status.textContent = 'Error: ' + error.message;
-            }
+            };
+
+            xhr.onload = function () {
+                if (xhr.status === 201) {
+                    status.textContent = "✅ Upload successful!";
+                } else {
+                    status.textContent = "❌ Upload failed: " + xhr.statusText;
+                }
+            };
+
+            xhr.onerror = function () {
+                status.textContent = "❌ Error during upload.";
+            };
+
+            xhr.send(file);
         }
     </script>
 </body>
