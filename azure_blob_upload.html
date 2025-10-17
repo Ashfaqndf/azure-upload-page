@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Azure Blob Upload</title>
+</head>
+<body>
+    <h2>Upload File to Azure Blob Storage</h2>
+    <input type="file" id="fileInput" />
+    <button onclick="uploadFile()">Upload</button>
+    <p id="status"></p>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const status = document.getElementById('status');
+            if (!fileInput.files.length) {
+                status.textContent = 'Please select a file.';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const blobName = encodeURIComponent(file.name);
+            const uploadUrl = "https://sgfortestingsasurl.blob.core.windows.net/tempcontainer?sp=racwl&st=2025-10-16T07:29:56Z&se=2025-10-16T15:44:56Z&spr=https&sv=2024-11-04&sr=c&sig=N92wyoVBc81vPx8cH7H4Y4O2B%2BRwoABcqlAvzlOtCXk%3D" + '/' + blobName;
+
+            try {
+                const response = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'x-ms-blob-type': 'BlockBlob'
+                    },
+                    body: file
+                });
+
+                if (response.ok) {
+                    status.textContent = 'Upload successful!';
+                } else {
+                    status.textContent = 'Upload failed: ' + response.statusText;
+                }
+            } catch (error) {
+                status.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
