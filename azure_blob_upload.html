@@ -21,7 +21,7 @@
 
             const file = fileInput.files[0];
             const blobName = encodeURIComponent(file.name);
-            const uploadUrl = "https://sgfortestingsasurl.blob.core.windows.net/tempcontainer?sp=racwl&st=2025-10-16T07:29:56Z&se=2025-10-16T15:44:56Z&spr=https&sv=2024-11-04&sr=c&sig=N92wyoVBc81vPx8cH7H4Y4O2B%2BRwoABcqlAvzlOtCXk%3D" + '/' + blobName;
+            const uploadUrl = "https://sgfortestingsasurl.blob.core.windows.net/tempcontainer?sp=r&st=2025-10-17T07:52:05Z&se=2025-10-17T16:07:05Z&spr=https&sv=2024-11-04&sr=c&sig=Hb8HaIG0e2b2CALpI1HIRcrvilwOC0TfLC6LiVnCAUg%3D" + '/' + blobName;
 
             try {
                 const response = await fetch(uploadUrl, {
