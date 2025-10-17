@@ -1,46 +1,32 @@
+async function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const status = document.getElementById('status');
+    if (!fileInput.files.length) {
+        status.textContent = 'Please select a file.';
+        return;
+    }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Azure Blob Upload</title>
-</head>
-<body>
-    <h2>Upload File to Azure Blob Storage</h2>
-    <input type="file" id="fileInput" />
-    <button onclick="uploadFile()">Upload</button>
-    <p id="status"></p>
+    const file = fileInput.files[0];
+    const blobName = encodeURIComponent(file.name);
+    const sasToken = "?sp=rw&st=2025-10-17T07:52:05Z&se=2025-10-17T16:07:05Z&spr=https&sv=2024-11-04&sr=c&sig=Hb8HaIG0e2b2CALpI1HIRcrvilwOC0TfLC6LiVnCAUg%3D";
+    const uploadUrl = `https://sgfortestingsasurl.blob.core.windows.net/tempcontainer/${blobName}${sasToken}`;
 
-    <script>
-        async function uploadFile() {
-            const fileInput = document.getElementById('fileInput');
-            const status = document.getElementById('status');
-            if (!fileInput.files.length) {
-                status.textContent = 'Please select a file.';
-                return;
-            }
+    try {
+        const response = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+                'x-ms-blob-type': 'BlockBlob'
+            },
+            body: file
+        });
 
-            const file = fileInput.files[0];
-            const blobName = encodeURIComponent(file.name);
-            const uploadUrl = "https://sgfortestingsasurl.blob.core.windows.net/tempcontainer?sp=r&st=2025-10-17T07:52:05Z&se=2025-10-17T16:07:05Z&spr=https&sv=2024-11-04&sr=c&sig=Hb8HaIG0e2b2CALpI1HIRcrvilwOC0TfLC6LiVnCAUg%3D" + '/' + blobName;
-
-            try {
-                const response = await fetch(uploadUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'x-ms-blob-type': 'BlockBlob'
-                    },
-                    body: file
-                });
-
-                if (response.ok) {
-                    status.textContent = 'Upload successful!';
-                } else {
-                    status.textContent = 'Upload failed: ' + response.statusText;
-                }
-            } catch (error) {
-                status.textContent = 'Error: ' + error.message;
-            }
+        if (response.ok) {
+            status.textContent = 'Upload successful!';
+        } else {
+            status.textContent = 'Upload failed: ' + response.statusText;
         }
-    </script>
-</body>
-</html>
+    } catch (error) {
+        status.textContent = 'Error: ' + error.message;
+    }
+}
+``
